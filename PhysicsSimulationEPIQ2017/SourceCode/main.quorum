@@ -1,0 +1,782 @@
+use Libraries.Game.Game
+use Libraries.Interface.Events.KeyboardListener
+use Libraries.Interface.Events.KeyboardEvent
+use Libraries.Compute.Vector2
+use Libraries.Game.Graphics.Color
+use Libraries.Game.Graphics.Drawable
+use Libraries.Game.Graphics.Skybox
+use Libraries.Game.Layer2D
+use Libraries.Game.Graphics.Model
+use Libraries.Game.Layer3D
+use Libraries.Compute.Vector3
+use Libraries.Game.Graphics.DirectionalLight
+use Libraries.Game.Graphics.AmbientLight
+use Libraries.Game.InputMonitor
+use Libraries.Sound.Audio
+use Libraries.Interface.Events.CollisionListener3D
+use Libraries.Interface.Events.CollisionEvent3D
+
+class Main is Game, KeyboardListener, CollisionListener3D
+
+    Drawable ground
+    Drawable box
+    Model ground3D
+    Model box3D
+
+    InputMonitor iMonitor
+    KeyboardEvent event
+
+    boolean is2DModeOn = false
+    boolean is3DModeOn = false
+    boolean isLinearVelocitySimulation = false
+
+    Audio scream
+
+    action Main
+        StartGame()
+    end
+
+    action CreateGame
+        EnablePhysics2D(true)
+        EnablePhysics3D(true)
+
+        AddKeyboardListener(me)
+
+        scream:Load("assets/WilhelmScream.ogg")
+
+        output "Welcome to the Quorum Physics Simulator!" 
+    end
+
+    action Update(number seconds)
+        if iMonitor:IsKeyPressed(event:NUM_2)
+            if not is3DModeOn
+                is2DModeOn = true
+            else
+                is3DModeOn = false
+                is2DModeOn = true
+            end
+        end
+
+        if iMonitor:IsKeyPressed(event:NUM_3)
+            if not is2DModeOn
+                is3DModeOn = true
+            else
+                is2DModeOn = false
+                is3DModeOn = true
+            end
+        end
+
+        if iMonitor:IsKeyPressed(event:ESCAPE)
+            if is2DModeOn
+                Layer2D l2D = GetCurrentLayer2D()
+
+                l2D:Remove(box)
+                l2D:Remove(ground)
+            elseif is3DModeOn
+                Layer3D l3D = GetCurrentLayer3D()
+
+                l3D:Remove(box3D)
+                l3D:Remove(ground3D)
+            end
+        end
+
+        if box3D:GetY() >= ground3D:GetY() and is3DModeOn and ground3D:IsShowing()
+            scream:Play()
+        end
+    end
+
+    action PressedKey(KeyboardEvent e)
+        if e:keyCode = e:F and is2DModeOn = true
+            Layer2D l2D = GetCurrentLayer2D()
+
+            if l2D:IsEmpty()
+                Color color
+            
+                ground:SetName("ground")
+                box:SetName("box")
+            
+                ground:LoadFilledRectangle(1000, 50)
+                box:LoadFilledRectangle(50, 50)
+
+                box:SetPosition(0, 500)
+            
+                ground:SetColor(color:Green())
+                box:SetColor(color:Blue())
+
+                Add(ground)
+                Add(box)
+            
+                ground:EnablePhysics(true)
+                box:EnablePhysics(true)
+
+                ground:SetUnmovable()
+                box:SetResponsive()
+
+                SetGravity2D(0, -200)
+
+                Vector2 force
+                force:Set(600, 1000)
+                box:ApplyForceToCenter(force)
+            else
+                l2D:Remove(box)
+                l2D:Remove(ground)
+                
+                Color color
+            
+                ground:SetName("ground")
+                box:SetName("box")
+            
+                ground:LoadFilledRectangle(1000, 50)
+                box:LoadFilledRectangle(50, 50)
+
+                box:SetPosition(0, 500)
+            
+                ground:SetColor(color:Green())
+                box:SetColor(color:Blue())
+
+                Add(ground)
+                Add(box)
+            
+                ground:EnablePhysics(true)
+                box:EnablePhysics(true)
+
+                ground:SetUnmovable()
+                box:SetResponsive()
+
+                SetGravity2D(0, -200)
+
+                Vector2 force
+                force:Set(600, 1000)
+                box:ApplyForceToCenter(force)
+            end
+        elseif e:keyCode = e:G and is2DModeOn
+            Layer2D l2D = GetCurrentLayer2D()
+
+            if l2D:IsEmpty()
+                Color color
+            
+                ground:SetName("ground")
+                box:SetName("box")
+            
+                ground:LoadFilledRectangle(1000, 50)
+                box:LoadFilledRectangle(50, 50)
+
+                box:SetPosition(100, 500)
+            
+                ground:SetColor(color:Green())
+                box:SetColor(color:Blue())
+
+                Add(ground)
+                Add(box)
+            
+                ground:EnablePhysics(true)
+                box:EnablePhysics(true)
+
+                ground:SetUnmovable()
+                box:SetResponsive()
+
+                SetGravity2D(0, -200) 
+            else
+                l2D:Remove(box)
+                l2D:Remove(ground)
+
+                Color color
+            
+                ground:SetName("ground")
+                box:SetName("box")
+            
+                ground:LoadFilledRectangle(1000, 50)
+                box:LoadFilledRectangle(50, 50)
+
+                box:SetPosition(100, 500)
+            
+                ground:SetColor(color:Green())
+                box:SetColor(color:Blue())
+
+                Add(ground)
+                Add(box)
+            
+                ground:EnablePhysics(true)
+                box:EnablePhysics(true)
+
+                ground:SetUnmovable()
+                box:SetResponsive()
+
+                SetGravity2D(0, -200)
+            end
+        elseif e:keyCode = e:T and is2DModeOn
+            Layer2D l2D = GetCurrentLayer2D()
+
+            if l2D:IsEmpty()
+                Color color
+            
+                ground:SetName("ground")
+                box:SetName("box")
+            
+                ground:LoadFilledRectangle(1000, 50)
+                box:LoadFilledRectangle(50, 50)
+
+                box:SetPosition(100, 500)
+            
+                ground:SetColor(color:Green())
+                box:SetColor(color:Blue())
+
+                Add(ground)
+                Add(box)
+            
+                ground:EnablePhysics(true)
+                box:EnablePhysics(true)
+
+                ground:SetUnmovable()
+                box:SetResponsive()
+
+                SetGravity2D(0, -200)
+
+                box:ApplyTorque(-90000) 
+            else
+                l2D:Remove(box)
+                l2D:Remove(ground)
+
+                Color color
+            
+                ground:SetName("ground")
+                box:SetName("box")
+            
+                ground:LoadFilledRectangle(1000, 50)
+                box:LoadFilledRectangle(50, 50)
+
+                box:SetPosition(100, 500)
+            
+                ground:SetColor(color:Green())
+                box:SetColor(color:Blue())
+
+                Add(ground)
+                Add(box)
+            
+                ground:EnablePhysics(true)
+                box:EnablePhysics(true)
+
+                ground:SetUnmovable()
+                box:SetResponsive()
+
+                SetGravity2D(0, -200)
+            
+                box:ApplyTorque(-90000)
+            end
+        elseif e:keyCode = e:A and is2DModeOn
+            Layer2D l2D = GetCurrentLayer2D()
+
+            if l2D:IsEmpty()
+               Color color
+            
+                ground:SetName("ground")
+                box:SetName("box")
+            
+                ground:LoadFilledRectangle(1000, 50)
+                box:LoadFilledRectangle(50, 50)
+
+                box:SetPosition(100, 500)
+            
+                ground:SetColor(color:Green())
+                box:SetColor(color:Blue())
+
+                Add(ground)
+                Add(box)
+            
+                ground:EnablePhysics(true)
+                box:EnablePhysics(true)
+
+                ground:SetUnmovable()
+                box:SetResponsive()
+
+                box:SetAngularVelocity(20)
+                SetGravity2D(0, -200) 
+            else
+                l2D:Remove(box)
+                l2D:Remove(ground)
+
+                Color color
+            
+                ground:SetName("ground")
+                box:SetName("box")
+            
+                ground:LoadFilledRectangle(1000, 50)
+                box:LoadFilledRectangle(50, 50)
+
+                box:SetPosition(100, 500)
+            
+                ground:SetColor(color:Green())
+                box:SetColor(color:Blue())
+
+                Add(ground)
+                Add(box)
+            
+                ground:EnablePhysics(true)
+                box:EnablePhysics(true)
+
+                ground:SetUnmovable()
+                box:SetResponsive()
+
+                box:SetAngularVelocity(20)
+                SetGravity2D(0, -200)
+            end
+        elseif e:keyCode = e:L and is2DModeOn
+            Layer2D l2D = GetCurrentLayer2D()
+
+            if l2D:IsEmpty()
+                Color color
+            
+                ground:SetName("ground")
+                box:SetName("box")
+            
+                ground:LoadFilledRectangle(1000, 50)
+                box:LoadFilledRectangle(50, 50)
+
+                box:SetPosition(100, 500)
+            
+                ground:SetColor(color:Green())
+                box:SetColor(color:Blue())
+
+                Add(ground)
+                Add(box)
+            
+                ground:EnablePhysics(true)
+                box:EnablePhysics(true)
+
+                ground:SetUnmovable()
+                box:SetResponsive()
+
+                Vector2 vel
+                vel:Set(100, 0)
+
+                box:SetLinearVelocity(vel)
+                SetGravity2D(0, -200) 
+            else
+                l2D:Remove(box)
+                l2D:Remove(ground)
+                
+                Color color
+            
+                ground:SetName("ground")
+                box:SetName("box")
+            
+                ground:LoadFilledRectangle(1000, 50)
+                box:LoadFilledRectangle(50, 50)
+
+                box:SetPosition(100, 500)
+            
+                ground:SetColor(color:Green())
+                box:SetColor(color:Blue())
+
+                Add(ground)
+                Add(box)
+            
+                ground:EnablePhysics(true)
+                box:EnablePhysics(true)
+
+                ground:SetUnmovable()
+                box:SetResponsive()
+
+                Vector2 vel
+                vel:Set(100, 0)
+
+                box:SetLinearVelocity(vel)
+                SetGravity2D(0, -200)
+            end
+        elseif e:keyCode = e:R and is2DModeOn
+            Layer2D l2D = GetCurrentLayer2D()
+
+            if l2D:IsEmpty()
+                Color color
+            
+                ground:SetName("ground")
+                box:SetName("box")
+            
+                ground:LoadFilledRectangle(1000, 50)
+                box:LoadFilledRectangle(50, 50)
+
+                box:SetPosition(100, 500)
+            
+                ground:SetColor(color:Green())
+                box:SetColor(color:Blue())
+
+                Add(ground)
+                Add(box)
+            
+                ground:EnablePhysics(true)
+                box:EnablePhysics(true)
+
+                ground:SetUnmovable()
+                box:SetResponsive()
+                
+                box:SetRestitution(0.75)
+
+                SetGravity2D(0, -800)
+            else
+                l2D:Remove(box)
+                l2D:Remove(ground)
+                
+                Color color
+            
+                ground:SetName("ground")
+                box:SetName("box")
+            
+                ground:LoadFilledRectangle(1000, 50)
+                box:LoadFilledRectangle(50, 50)
+
+                box:SetPosition(100, 500)
+            
+                ground:SetColor(color:Green())
+                box:SetColor(color:Blue())
+
+                Add(ground)
+                Add(box)
+            
+                ground:EnablePhysics(true)
+                box:EnablePhysics(true)
+
+                ground:SetUnmovable()
+                box:SetResponsive()
+            
+                box:SetRestitution(0.75)
+
+                SetGravity2D(0, -200)
+            end
+        end
+
+        if e:keyCode = e:F and is3DModeOn
+            Layer3D l3D = GetCurrentLayer3D()
+            Color c
+
+            if l3D:IsEmpty()
+                GetCamera3D():Move(0, 3, -3)
+
+                Vector3 force3D
+                force3D:Set(50, 0, 0)
+
+                DirectionalLight light
+                light:SetDirection(1, -4, -3)
+                light:SetColor(0.8, 0.8, 0.8, 1)
+                Add(light)
+
+                AmbientLight ambient
+                ambient:SetColor(0.4, 0.4, 0.4, 1)
+                SetAmbientLight(ambient)
+
+                box3D:LoadBox(1, 1, 1, c:Cyan())
+                box3D:Rotate(0, 0, 1, 45)
+                box3D:Rotate(1, 0, 0, 45)
+                box3D:Move(0, 9, 0)
+                Add(box3D)
+
+                ground3D:LoadBox(7, 0.25, 7, c:Blue())
+                ground3D:Rotate(0, 1, 0, 45)
+                Add(ground3D)
+
+                ground3D:EnablePhysics(true)
+                box3D:EnablePhysics(true)
+
+                ground3D:SetUnmovable()
+                box3D:SetResponsive()
+
+                SetGravity3D(0, -10, 0)
+                box3D:ApplyForceToCenter(force3D)
+            else
+                l3D:Remove(box3D)
+                l3D:Remove(ground3D)
+                
+                GetCamera3D():Move(0, 3, -3)
+
+                Vector3 force3D
+                force3D:Set(50, 0, 0)
+
+                DirectionalLight light
+                light:SetDirection(1, -4, -3)
+                light:SetColor(0.8, 0.8, 0.8, 1)
+                Add(light)
+
+                AmbientLight ambient
+                ambient:SetColor(0.4, 0.4, 0.4, 1)
+                SetAmbientLight(ambient)
+
+                box3D:LoadBox(1, 1, 1, c:Cyan())
+                box3D:Rotate(0, 0, 1, 45)
+                box3D:Rotate(1, 0, 0, 45)
+                box3D:Move(0, 9, 0)
+                Add(box3D)
+
+                ground3D:LoadBox(7, 0.25, 7, c:Blue())
+                ground3D:Rotate(0, 1, 0, 45)
+                Add(ground3D)
+
+                ground3D:EnablePhysics(true)
+                box3D:EnablePhysics(true)
+
+                ground3D:SetUnmovable()
+                box3D:SetResponsive()
+
+                SetGravity3D(0, -10, 0)
+                box3D:ApplyForceToCenter(force3D)
+            end
+        elseif e:keyCode = e:G and is3DModeOn
+            Layer3D l3D = GetCurrentLayer3D()
+            Color c
+
+            if l3D:IsEmpty()
+                ground3D:LoadBox(7, 0.25, 7, c:Blue())
+                box3D:LoadBox(1, 1, 1, c:Cyan())
+
+                box3D:Move(0, 9, 0)
+                
+                GetCamera3D():Move(0, 3, -3)
+                
+                DirectionalLight light
+                light:SetDirection(1, -4, -3)
+                light:SetColor(0.8, 0.8, 0.8, 1)
+                Add(light)
+
+                AmbientLight ambient
+                ambient:SetColor(0.4, 0.4, 0.4, 1)
+                SetAmbientLight(ambient)
+
+                ground3D:Rotate(0, 1, 0, 45)
+
+                Add(box3D)
+                Add(ground3D)
+                
+                box3D:EnablePhysics(true)
+                ground3D:EnablePhysics(true)
+
+                ground3D:SetUnmovable()
+                box3D:SetResponsive()
+
+                SetGravity3D(0, -20, 0)
+            else
+                l3D:Remove(box3D)
+                l3D:Remove(ground3D)
+
+                ground3D:LoadBox(7, 0.25, 7, c:Blue())
+                box3D:LoadBox(1, 1, 1, c:Cyan())
+
+                box3D:Move(0, 9, 0)
+                
+                GetCamera3D():Move(0, 3, -3)
+                
+                DirectionalLight light
+                light:SetDirection(1, -4, -3)
+                light:SetColor(0.8, 0.8, 0.8, 1)
+                Add(light)
+
+                AmbientLight ambient
+                ambient:SetColor(0.4, 0.4, 0.4, 1)
+                SetAmbientLight(ambient)
+
+                ground3D:Rotate(0, 1, 0, 45)
+
+                Add(box3D)
+                Add(ground3D)
+                
+                box3D:EnablePhysics(true)
+                ground3D:EnablePhysics(true)
+
+                ground3D:SetUnmovable()
+                box3D:SetResponsive()
+
+                SetGravity3D(0, -20, 0)
+            end
+        elseif e:keyCode = e:T and is3DModeOn
+            Layer3D l3D = GetCurrentLayer3D()
+            Color c
+
+            if l3D:IsEmpty()
+                ground3D:LoadBox(7, 0.25, 7, c:Blue())
+                box3D:LoadBox(1, 1, 1, c:Cyan())
+
+                box3D:Move(0, 2, 0)
+                
+                GetCamera3D():Move(0, 3, -3)
+                
+                DirectionalLight light
+                light:SetDirection(1, -4, -3)
+                light:SetColor(0.8, 0.8, 0.8, 1)
+                Add(light)
+
+                AmbientLight ambient
+                ambient:SetColor(0.4, 0.4, 0.4, 1)
+                SetAmbientLight(ambient)
+
+                ground3D:Rotate(0, 1, 0, 45)
+
+                Add(box3D)
+                Add(ground3D)
+                
+                box3D:EnablePhysics(true)
+                ground3D:EnablePhysics(true)
+
+                ground3D:SetUnmovable()
+                box3D:SetResponsive()
+
+                Vector3 torque
+                torque:Set(0, 0, 40)
+
+                box3D:ApplyTorque(torque)
+            else
+                l3D:Remove(box3D)
+                l3D:Remove(ground3D)
+
+                ground3D:LoadBox(7, 0.25, 7, c:Blue())
+                box3D:LoadBox(1, 1, 1, c:Cyan())
+
+                box3D:Move(0, 2, 0)
+                
+                GetCamera3D():Move(0, 3, -3)
+                
+                DirectionalLight light
+                light:SetDirection(1, -4, -3)
+                light:SetColor(0.8, 0.8, 0.8, 1)
+                Add(light)
+
+                AmbientLight ambient
+                ambient:SetColor(0.4, 0.4, 0.4, 1)
+                SetAmbientLight(ambient)
+
+                ground3D:Rotate(0, 1, 0, 45)
+
+                Add(box3D)
+                Add(ground3D)
+                
+                box3D:EnablePhysics(true)
+                ground3D:EnablePhysics(true)
+
+                ground3D:SetUnmovable()
+                box3D:SetResponsive()
+
+                Vector3 torque
+                torque:Set(0, 0, 40)
+
+                box3D:ApplyTorque(torque)
+            end
+
+        elseif e:keyCode = e:A and is3DModeOn
+            Layer3D l3D = GetCurrentLayer3D()
+            Color c
+
+            if l3D:IsEmpty()
+                ground3D:LoadBox(7, 0.25, 7, c:Blue())
+                box3D:LoadBox(1, 1, 1, c:Cyan())
+
+                box3D:Move(0, 9, 0)
+                
+                GetCamera3D():Move(0, 3, -3)
+                
+                DirectionalLight light
+                light:SetDirection(1, -4, -3)
+                light:SetColor(0.8, 0.8, 0.8, 1)
+                Add(light)
+
+                AmbientLight ambient
+                ambient:SetColor(0.4, 0.4, 0.4, 1)
+                SetAmbientLight(ambient)
+
+                ground3D:Rotate(0, 1, 0, 45)
+
+                Add(box3D)
+                Add(ground3D)
+                
+                box3D:EnablePhysics(true)
+                ground3D:EnablePhysics(true)
+
+                ground3D:SetUnmovable()
+                box3D:SetResponsive()
+
+                Vector3 angularVelocity
+                angularVelocity:Set(0, 0, 10)
+
+                box3D:SetAngularVelocity(angularVelocity)
+
+                SetGravity3D(0, -5, 0)
+            else
+                l3D:Remove(box3D)
+                l3D:Remove(ground3D)
+
+                ground3D:LoadBox(7, 0.25, 7, c:Blue())
+                box3D:LoadBox(1, 1, 1, c:Cyan())
+
+                box3D:Move(0, 9, 0)
+                
+                GetCamera3D():Move(0, 3, -3)
+                
+                DirectionalLight light
+                light:SetDirection(1, -4, -3)
+                light:SetColor(0.8, 0.8, 0.8, 1)
+                Add(light)
+
+                AmbientLight ambient
+                ambient:SetColor(0.4, 0.4, 0.4, 1)
+                SetAmbientLight(ambient)
+
+                ground3D:Rotate(0, 1, 0, 45)
+
+                Add(box3D)
+                Add(ground3D)
+                
+                box3D:EnablePhysics(true)
+                ground3D:EnablePhysics(true)
+
+                ground3D:SetUnmovable()
+                box3D:SetResponsive()
+
+                Vector3 angularVelocity
+                angularVelocity:Set(0, 0, 10)
+
+                box3D:SetAngularVelocity(angularVelocity)
+
+                SetGravity3D(0, -20, 0)
+            end
+        elseif e:keyCode = e:L and is3DModeOn
+            isLinearVelocitySimulation = true
+
+            Layer3D l3D = GetCurrentLayer3D()
+            Color c
+
+            ground3D:LoadBox(7, 0.25, 7, c:Blue())
+            box3D:LoadBox(1, 1, 1, c:Cyan())
+
+            box3D:Move(0, 9, 0)
+            
+            GetCamera3D():Move(0, 3, -3)
+                
+            DirectionalLight light
+            light:SetDirection(1, -4, -3)
+            light:SetColor(0.8, 0.8, 0.8, 1)
+            Add(light)
+
+            AmbientLight ambient
+            ambient:SetColor(0.4, 0.4, 0.4, 1)
+            SetAmbientLight(ambient)
+
+            ground3D:Rotate(0, 1, 0, 45)
+
+            Add(box3D)
+            Add(ground3D)
+                
+            box3D:EnablePhysics(true)
+            ground3D:EnablePhysics(true)
+
+            ground3D:SetUnmovable()
+            box3D:SetResponsive()
+
+            box3D:SetLinearVelocityX(1)
+
+            SetGravity3D(0, -10, 0)
+        end
+    end
+
+    action BeginCollision(CollisionEvent3D e)
+        
+    end
+
+    action FinishCollision(CollisionEvent3D e)
+        
+    end
+end

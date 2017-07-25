@@ -731,41 +731,75 @@ class Main is Game, KeyboardListener
                 SetGravity3D(0, -20, 0)
             end
         elseif e:keyCode = e:L and is3DModeOn
-            isLinearVelocitySimulation = true
-
             Layer3D l3D = GetCurrentLayer3D()
             Color c
-
-            ground3D:LoadBox(7, 0.25, 7, c:Blue())
-            box3D:LoadBox(1, 1, 1, c:Cyan())
-
-            box3D:Move(0, 9, 0)
             
-            GetCamera3D():Move(0, 3, -3)
+            if l3D:IsEmpty()
+                ground3D:LoadBox(7, 0.25, 7, c:Blue())
+                box3D:LoadBox(1, 1, 1, c:Cyan())
+
+                box3D:Move(0, 9, 0)
+            
+                GetCamera3D():Move(0, 3, -3)
                 
-            DirectionalLight light
-            light:SetDirection(1, -4, -3)
-            light:SetColor(0.8, 0.8, 0.8, 1)
-            Add(light)
+                DirectionalLight light
+                light:SetDirection(1, -4, -3)
+                light:SetColor(0.8, 0.8, 0.8, 1)
+                Add(light)
 
-            AmbientLight ambient
-            ambient:SetColor(0.4, 0.4, 0.4, 1)
-            SetAmbientLight(ambient)
+                AmbientLight ambient
+                ambient:SetColor(0.4, 0.4, 0.4, 1)
+                SetAmbientLight(ambient)
 
-            ground3D:Rotate(0, 1, 0, 45)
+                ground3D:Rotate(0, 1, 0, 45)
 
-            Add(box3D)
-            Add(ground3D)
+                Add(box3D)
+                Add(ground3D)
                 
-            box3D:EnablePhysics(true)
-            ground3D:EnablePhysics(true)
+                box3D:EnablePhysics(true)
+                ground3D:EnablePhysics(true)
 
-            ground3D:SetUnmovable()
-            box3D:SetResponsive()
+                ground3D:SetUnmovable()
+                box3D:SetResponsive()
 
-            box3D:SetLinearVelocityX(1)
+                box3D:SetLinearVelocityX(1)
 
-            SetGravity3D(0, -10, 0)
+                SetGravity3D(0, -10, 0)
+            else
+                l3D:Remove(box3D)
+                l3D:Remove(ground3D)
+
+                ground3D:LoadBox(7, 0.25, 7, c:Blue())
+                box3D:LoadBox(1, 1, 1, c:Cyan())
+
+                box3D:Move(0, 9, 0)
+            
+                GetCamera3D():Move(0, 3, -3)
+                
+                DirectionalLight light
+                light:SetDirection(1, -4, -3)
+                light:SetColor(0.8, 0.8, 0.8, 1)
+                Add(light)
+
+                AmbientLight ambient
+                ambient:SetColor(0.4, 0.4, 0.4, 1)
+                SetAmbientLight(ambient)
+
+                ground3D:Rotate(0, 1, 0, 45)
+
+                Add(box3D)
+                Add(ground3D)
+                
+                box3D:EnablePhysics(true)
+                ground3D:EnablePhysics(true)
+
+                ground3D:SetUnmovable()
+                box3D:SetResponsive()
+
+                box3D:SetLinearVelocityX(1)
+
+                SetGravity3D(0, -10, 0)
+            end
         elseif e:keyCode = e:R and is3DModeOn
             Layer3D l3D = GetCurrentLayer3D()
             Color c

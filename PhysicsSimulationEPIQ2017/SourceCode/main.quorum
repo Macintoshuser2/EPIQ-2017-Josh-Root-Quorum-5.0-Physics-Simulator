@@ -69,11 +69,15 @@ class Main is Game, KeyboardListener
 
                 l2D:Remove(box)
                 l2D:Remove(ground)
+
+                is2DModeOn = false
             elseif is3DModeOn
                 Layer3D l3D = GetCurrentLayer3D()
 
                 l3D:Remove(box3D)
                 l3D:Remove(ground3D)
+
+                is3DModeOn = false
             end
         end
 
@@ -523,7 +527,7 @@ class Main is Game, KeyboardListener
                 ground3D:LoadBox(7, 0.25, 7, c:Blue())
                 box3D:LoadBox(1, 1, 1, c:Cyan())
 
-                box3D:Move(0, 9, 0)
+                box3D:Move(0, 5, 0)
                 
                 GetCamera3D():Move(0, 3, -3)
                 

@@ -7,10 +7,15 @@ use Libraries.Interface.Events.KeyboardEvent
 use Libraries.Game.Graphics.Color
 use Libraries.Compute.Vector2
 use Libraries.Containers.Array
+use Libraries.Compute.Random
+use Libraries.Compute.Math
 
 class Main is Game, KeyboardListener
 
     boolean isForceSim = false
+    boolean isAngularVelocitySim = false
+    boolean isLinearVelocitySim = false
+    boolean isTorqueSim = false
 
     Audio wilhelm
     
@@ -141,6 +146,11 @@ class Main is Game, KeyboardListener
     Drawable wallLeft
     Drawable wallRight
 
+    Drawable pinwheel
+
+    Drawable movableBox
+    Drawable groundLinearVelSim
+
     Color color
 
     Array<Drawable> gameObjects
@@ -156,11 +166,15 @@ class Main is Game, KeyboardListener
     end
 
     action Update(number seconds)
-        
+        if isLinearVelocitySim
+            if movableBox:GetX() >= GetScreenWidth()
+                movableBox:SetX(-50)
+            end
+        end
     end
 
     action PressedKey(KeyboardEvent e)
-        if e:keyCode = e:F
+        if e:keyCode = e:F and GetCurrentLayer2D():IsEmpty()
             isForceSim = true
             
             player:LoadFilledCircle(25, color:Teal())
@@ -315,21 +329,50 @@ class Main is Game, KeyboardListener
             LoadBox(boxOneHundredEighteen, 10, 10, color:Magenta(), boxOneHundredFifteen:GetX() - 5, 230, "boxOneHundredEighteen", true, 0.25, 0.5)
             LoadBox(boxOneHundredNineteen, 10, 10, color:Maroon(), boxOneHundredEighteen:GetX() - 10, 230, "boxOneHundredNineteen", true, 0.25, 0.5)
             LoadBox(boxOneHundredTwenty, 10, 10, color:Navy(), boxOneHundredEighteen:GetX() - 5, 240, "boxOneHundredTwenty", true, 0.25, 0.5)
-        end
 
-        if e:keyCode = e:SPACE and isForceSim = true
-            Vector2 force
-            force:Set(40000, 5000)
-            player:ApplyForceToCenter(force)
-        end
+            integer counter = 0
 
-        if e:keyCode = e:G
+            repeat gameObjects:GetSize() times
+                gameObjects:Get(counter):SetFriction(0.7)
+                counter = counter + 1
+            end
 
-            ground:LoadFilledRectangle(1000, 100, color:Green())
+            ground:SetFriction(0.7)
+            player:SetFriction(0.7)
+        elseif e:keyCode = e:F and not GetCurrentLayer2D():IsEmpty()
+            GetCurrentLayer2D():Empty()
+
+            isForceSim = true
             
+            player:LoadFilledCircle(25, color:Teal())
+            player:SetPosition(0, 100)
+            
+            ground:LoadFilledRectangle(1000, 100, color:CustomColor(0.25, 0.5, 0.75, 1))
+            ground:SetPosition(0, 10)
+            
+            wallLeft:LoadFilledRectangle(50, 100000)
+            wallLeft:SetPosition(-50, 100)
+            
+            wallRight:LoadFilledRectangle(50, 100000)
+            wallRight:SetPosition(GetScreenWidth(), 100)
+            wallRight:SetColor(color:Pink())
+
+            Add(player)
             Add(ground)
+            Add(wallLeft)
+            Add(wallRight)
+
+            player:EnablePhysics(true)
             ground:EnablePhysics(true)
+            wallLeft:EnablePhysics(true)
+            wallRight:EnablePhysics(true)
+
+            player:SetResponsive()
             ground:SetUnmovable()
+            wallLeft:SetUnmovable()
+            wallRight:SetUnmovable()
+            
+            player:SetRestitution(0.75)
 
             SetGravity2D(0, -200)
 
@@ -453,11 +496,285 @@ class Main is Game, KeyboardListener
             LoadBox(boxOneHundredEighteen, 10, 10, color:Magenta(), boxOneHundredFifteen:GetX() - 5, 230, "boxOneHundredEighteen", true, 0.25, 0.5)
             LoadBox(boxOneHundredNineteen, 10, 10, color:Maroon(), boxOneHundredEighteen:GetX() - 10, 230, "boxOneHundredNineteen", true, 0.25, 0.5)
             LoadBox(boxOneHundredTwenty, 10, 10, color:Navy(), boxOneHundredEighteen:GetX() - 5, 240, "boxOneHundredTwenty", true, 0.25, 0.5)
+
+            integer counter = 0
+
+            repeat gameObjects:GetSize() times
+                gameObjects:Get(counter):SetFriction(0.7)
+                counter = counter + 1
+            end
+
+            ground:SetFriction(0.7)
+            player:SetFriction(0.7)
+        end
+
+        if e:keyCode = e:SPACE and isForceSim = true
+            Vector2 force
+            force:Set(40000, 5000)
+            player:ApplyForceToCenter(force)
+        end
+
+        if e:keyCode = e:G and GetCurrentLayer2D():IsEmpty()
+        
+            gameObjects:Empty()
+
+            ground:LoadFilledRectangle(1000, 100, color:Green())
+            
+            Add(ground)
+            ground:EnablePhysics(true)
+            ground:SetUnmovable()
+
+            Random rand
+            
+            integer counter = 0
+
+            repeat 100 times
+                number randX = cast(number, rand:RandomIntegerBetween(0, 800))
+                number randY = cast(number, rand:RandomIntegerBetween(300, 590))
+
+                Drawable d
+                LoadBox(d, 10, 10, color:Red(), randX, randY, "Drawable " + counter, true, 0.25, 0)
+            end
+
+            repeat 100 times
+                number randX = cast(number, rand:RandomIntegerBetween(0, 800))
+                number randY = cast(number, rand:RandomIntegerBetween(300, 590))
+
+                Drawable d
+                LoadBox(d, 10, 10, color:Green(), randX, randY, "Drawable " + counter, true, 0.25, 0)
+            end
+
+            repeat 100 times
+                number randX = cast(number, rand:RandomIntegerBetween(0, 800))
+                number randY = cast(number, rand:RandomIntegerBetween(300, 590))
+
+                Drawable d
+                LoadBox(d, 10, 10, color:Blue(), randX, randY, "Drawable " + counter, true, 0.25, 0)
+            end
+
+            SetGravity2D(0, -200)
+
+        elseif e:keyCode = e:G and not GetCurrentLayer2D():IsEmpty()
+            GetCurrentLayer2D():Empty()
+
+            gameObjects:Empty()
+
+            ground:LoadFilledRectangle(1000, 100, color:Green())
+            
+            Add(ground)
+            ground:EnablePhysics(true)
+            ground:SetUnmovable()
+
+            Random rand
+            
+            integer counter = 0
+
+            repeat 100 times
+                number randX = cast(number, rand:RandomIntegerBetween(0, 800))
+                number randY = cast(number, rand:RandomIntegerBetween(300, 590))
+
+                Drawable d
+                LoadBox(d, 10, 10, color:Red(), randX, randY, "Drawable " + counter, true, 0.25, 0)
+            end
+
+            repeat 100 times
+                number randX = cast(number, rand:RandomIntegerBetween(0, 800))
+                number randY = cast(number, rand:RandomIntegerBetween(300, 590))
+
+                Drawable d
+                LoadBox(d, 10, 10, color:Green(), randX, randY, "Drawable " + counter, true, 0.25, 0)
+            end
+
+            repeat 100 times
+                number randX = cast(number, rand:RandomIntegerBetween(0, 800))
+                number randY = cast(number, rand:RandomIntegerBetween(300, 590))
+
+                Drawable d
+                LoadBox(d, 10, 10, color:Blue(), randX, randY, "Drawable " + counter, true, 0.25, 0)
+            end
+
+            SetGravity2D(0, -200)
+        end
+
+        if e:keyCode = e:A and GetCurrentLayer2D():IsEmpty()
+            isAngularVelocitySim = true
+
+            pinwheel:Load("assets/pinwheel.png")
+
+            pinwheel:SetPosition(GetScreenWidth() / 2 - (pinwheel:GetWidth() / 2), GetScreenHeight() / 2 - (pinwheel:GetHeight() / 2))
+
+            Add(pinwheel)
+
+            pinwheel:EnablePhysics(true)
+            pinwheel:SetResponsive()
+        elseif e:keyCode = e:A and not GetCurrentLayer2D():IsEmpty()
+            GetCurrentLayer2D():Empty()
+            SetGravity2D(0, 0)
+            
+            isAngularVelocitySim = true
+
+            pinwheel:Load("assets/pinwheel.png")
+
+            pinwheel:SetPosition(GetScreenWidth() / 2 - (pinwheel:GetWidth() / 2), GetScreenHeight() / 2 - (pinwheel:GetHeight() / 2))
+
+            Add(pinwheel)
+
+            pinwheel:EnablePhysics(true)
+            pinwheel:SetResponsive()
+        end
+
+        if e:keyCode = e:LEFT and isAngularVelocitySim
+            pinwheel:SetAngularDamping(0)
+            pinwheel:SetAngularVelocity(20)
+        end
+
+        if e:keyCode = e:RIGHT and isAngularVelocitySim
+            pinwheel:SetAngularDamping(0)
+            pinwheel:SetAngularVelocity(-20)
+        end
+
+        if e:keyCode = e:L and GetCurrentLayer2D():IsEmpty()
+            isLinearVelocitySim = true
+
+            movableBox:LoadFilledRectangle(70, 70, color:Teal())
+            movableBox:SetPosition(0, 50)
+
+            groundLinearVelSim:LoadFilledRectangle(1000, 50, color:Green())
+            
+            Add(movableBox)
+            Add(groundLinearVelSim)
+
+            movableBox:EnablePhysics(true)
+            groundLinearVelSim:EnablePhysics(true)
+
+            movableBox:SetResponsive()
+            groundLinearVelSim:SetUnmovable()
+        elseif e:keyCode = e:L and not GetCurrentLayer2D():IsEmpty()
+            GetCurrentLayer2D():Empty()
+            
+            isLinearVelocitySim = true
+
+            movableBox:LoadFilledRectangle(70, 70, color:Teal())
+            movableBox:SetPosition(0, 50)
+
+            groundLinearVelSim:LoadFilledRectangle(1000, 50, color:Green())
+            
+            Add(movableBox)
+            Add(groundLinearVelSim)
+
+            movableBox:EnablePhysics(true)
+            groundLinearVelSim:EnablePhysics(true)
+
+            movableBox:SetResponsive()
+            groundLinearVelSim:SetUnmovable()
+        end
+
+        if e:keyCode = e:RIGHT and isLinearVelocitySim
+            movableBox:SetLinearDamping(0)
+            movableBox:SetLinearVelocityX(500)
+        end
+
+        if e:keyCode = e:R and GetCurrentLayer2D():IsEmpty()
+            Drawable floor
+            Drawable ball
+
+            floor:LoadFilledRectangle(1000, 25, color:Green())
+            ball:LoadFilledCircle(30, color:Blue())
+
+            ball:SetPosition(GetScreenWidth() / 2 - 15, 600)
+
+            Add(floor)
+            Add(ball)
+
+            floor:EnablePhysics(true)
+            ball:EnablePhysics(true)
+            
+            floor:SetUnmovable()
+            ball:SetResponsive()
+
+            floor:SetRestitution(0.85)
+
+            SetGravity2D(0, -300)
+        elseif e:keyCode = e:R and not GetCurrentLayer2D():IsEmpty()
+            GetCurrentLayer2D():Empty()
+
+            Drawable floor
+            Drawable ball
+
+            floor:LoadFilledRectangle(1000, 25, color:Green())
+            ball:LoadFilledCircle(30, color:Blue())
+
+            ball:SetPosition(GetScreenWidth() / 2 - 15, 600)
+
+            Add(floor)
+            Add(ball)
+
+            floor:EnablePhysics(true)
+            ball:EnablePhysics(true)
+            
+            floor:SetUnmovable()
+            ball:SetResponsive()
+
+            floor:SetRestitution(0.85)
+
+            SetGravity2D(0, -500)
+        end
+
+        if e:keyCode = e:ESCAPE
+            GetCurrentLayer2D():Empty()
+            isAngularVelocitySim = false
+            isForceSim = false
+            isLinearVelocitySim = false
+            isTorqueSim = false
+        end
+
+        if e:keyCode = e:T and GetCurrentLayer2D():IsEmpty()
+            isTorqueSim = true
+
+            pinwheel:Load("assets/pinwheel.png")
+            pinwheel:SetPosition(GetScreenWidth() / 2 - (pinwheel:GetWidth() / 2), GetScreenHeight() / 2 - (pinwheel:GetHeight() / 2))
+            Add(pinwheel)
+            pinwheel:EnablePhysics(true)
+            pinwheel:SetResponsive()
+            SetGravity2D(0, 0)
+        elseif e:keyCode = e:T and not GetCurrentLayer2D():IsEmpty()
+            GetCurrentLayer2D():Empty()
+            
+            isTorqueSim = true
+
+            pinwheel:Load("assets/pinwheel.png")
+            pinwheel:SetPosition(GetScreenWidth() / 2 - (pinwheel:GetWidth() / 2), GetScreenHeight() / 2 - (pinwheel:GetHeight() / 2))
+            Add(pinwheel)
+            pinwheel:EnablePhysics(true)
+            pinwheel:SetResponsive()
+            SetGravity2D(0, 0)
+
+            output "space pressed"
+        end
+
+        if e:keyCode = e:SPACE and isTorqueSim
+            Math math
+
+            output "space pressed"
+
+            number torque = math:RaiseToPower(10, 6)
+
+            pinwheel:ApplyTorque(torque)
         end
     end
 
     action ReleasedKey(KeyboardEvent e)
+        if e:keyCode = e:LEFT and isAngularVelocitySim
+            pinwheel:SetAngularDamping(1)
+        end
 
+        if e:keyCode = e:RIGHT and isAngularVelocitySim
+            pinwheel:SetAngularDamping(1)
+        end
+
+        if e:keyCode = e:RIGHT and isLinearVelocitySim
+            movableBox:SetLinearDamping(1)
+        end
     end
     
     /* Loads a Box on the screen using the specified width, height, and color, sets the initial position, sets the name for collision purposes, defines whether or not to enable physics, sets the mass and restitution */

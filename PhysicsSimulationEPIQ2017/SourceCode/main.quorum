@@ -748,8 +748,6 @@ class Main is Game, KeyboardListener
             pinwheel:EnablePhysics(true)
             pinwheel:SetResponsive()
             SetGravity2D(0, 0)
-
-            output "space pressed"
         end
 
         if e:keyCode = e:SPACE and isTorqueSim
